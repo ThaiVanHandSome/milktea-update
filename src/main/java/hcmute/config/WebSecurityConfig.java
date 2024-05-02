@@ -26,8 +26,6 @@ import hcmute.entity.CartEntity;
 import hcmute.entity.UserEntity;
 import hcmute.security.CustomUserDetails;
 import hcmute.security.CustomUserDetailsService;
-import hcmute.security.oauth2.CustomOAuth2UserService;
-import hcmute.security.oauth2.OAuthLoginSuccessHandler;
 import hcmute.service.ICartService;
 import hcmute.service.IUserService;
 
@@ -41,10 +39,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	IUserService userService;
 
-	@Autowired
-	private CustomOAuth2UserService oauthUserService;
-	@Autowired
-	private OAuthLoginSuccessHandler oauthLoginSuccessHandler;
 	@Autowired
 	ICartService cartService;
 
@@ -80,8 +74,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		// Cấu hình bảo mật HTTP
-		http.csrf().disable().cors();
 		// Phân quyền
 		http.authorizeRequests()
 				// Không cần xác thực
@@ -117,11 +109,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 					}
 					response.sendRedirect("/home");
 				}).failureUrl("/security/login");
-
-		// Cấu hình đăng nhập oauth2
-		http.oauth2Login().loginPage("/security/login").failureUrl("/security/login").authorizationEndpoint()
-				.baseUri("/oauth2/authorization").and().userInfoEndpoint().userService(oauthUserService).and()
-				.successHandler(oauthLoginSuccessHandler);
 
 		// Cấu hình remember me
 		http.rememberMe().tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21)) // expired after 21 days
